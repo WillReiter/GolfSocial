@@ -1,17 +1,18 @@
+import router from "next/router";
 import React from "react";
 
 const Header: React.FC = () => {
     return (
-        <header className="w-full bg-white shadow-md px-6 py-3 flex items-center relative">
+        <header className="w-full bg-gray shadow-md px-6 py-3 flex items-center relative">
             {/* Left: Logo Placeholder */}
             <div className="flex items-center">
-                <div className="w-35 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold">
+                <div className="w-24 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold hover:cursor-pointer hover:text-green-600" onClick={() => router.push("/")}>
                     Birdogie
                 </div>
             </div>
 
             {/* Middle: Searchbar Centered Absolutely */}
-            <div className="absolute left-1/2 transform -translate-x-1/2 w-1/4">
+            <div className="dark:absolute left-1/2 transform -translate-x-1/2 w-1/4">
                 <div className="relative">
                     <span className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         {/* Search Icon (Heroicons or SVG) */}

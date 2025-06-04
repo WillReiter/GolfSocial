@@ -1,26 +1,10 @@
 
 
 import React, { useState, useEffect } from 'react';
-
-
-const feedData = [
-    {
-        id: 1,
-        title: "First Post",
-        content: "This is the content of the first post.",
-        upvotes: 12,
-        downvotes: 2,
-        comments: 3,
-    },
-    {
-        id: 2,
-        title: "Second Post",
-        content: "Here's some more interesting content.",
-        upvotes: 8,
-        downvotes: 1,
-        comments: 1,
-    },
-];
+import { useRouter } from 'next/navigation';
+import { IconMessageCircle } from '@tabler/icons-react';
+import Upvote from '../upvote/upvote';
+import Downvote from '../downvote/downvote';
 
 interface feedData {
     id: number,
@@ -28,6 +12,8 @@ interface feedData {
     content: string,
     upvotes: number,
     downvotes: number,
+    commentCount: number,
+    // The clicked logic is flawed. Should be a var of type string that is called 'Voted' with possible values [up, down, no] to stop from being able to upvote and downvote a post
     clickedUpvote: boolean,
     clickedDownvote: boolean,
 }
@@ -35,31 +21,31 @@ interface feedData {
 const Feed = () => {
 
     const [feedData, setFeedData] = useState<feedData[]>([]);
-    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [isLoading, setIsLoading] = useState<boolean>(true); //SET TO TRUE
+    const router = useRouter();
 
     useEffect(() => {
-        async function fetchFeedData() {
-            try {
-                let url = "http://localhost:8080/posts"
-                const response = await fetch(url, { method: "GET" });
-                const data = await response.json();
-                console.log("DATA: ", data)
-                setFeedData(data);
-            } catch (error) {
-                console.error("Error fetching feed data:", error);
-            } finally {
-                setIsLoading(false);
-            }
-        }
-
         fetchFeedData();
     }, []);
 
+    async function fetchFeedData() {
+        try {
+            let url = "http://localhost:8080/posts"
+            const response = await fetch(url, { method: "GET" });
+            const data = await response.json();
+            console.log("DATA: ", data)
+            setFeedData(data);
+        } catch (error) {
+            console.error("Error fetching feed data:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
     async function removeUpvote(id: number) {
         try {
-            let url = `http://localhost:8080/post/removeUpvote/${id}`
+            let url = `http://localhost:8080/posts/removeUpvote/${id}`
             await fetch(url, { method: "PATCH" })
-            // setFeedData(feedData.map(item => item.id === id ? { ...item, upvotes: item.upvotes--, clickedUpvote: !item.clickedUpvote } : item))
         } catch (error) {
             console.error(`Error removing upvote to post with id "${id}"`)
         }
@@ -67,57 +53,89 @@ const Feed = () => {
 
     async function addUpvote(id: number) {
         try {
-            let url = `http://localhost:8080/post/addUpvote/${id}`
+            let url = `http://localhost:8080/posts/addUpvote/${id}`
             await fetch(url, { method: "PATCH" })
-            // setFeedData(feedData.map(item => item.id === id ? { ...item, upvotes: item.upvotes++, clickedUpvote: !item.clickedUpvote } : item))
         } catch (error) {
             console.error(`Error adding upvote to post with id "${id}"`)
         }
     }
 
+    async function removeDownvote(id: number) {
+        try {
+            let url = `http://localhost:8080/posts/removeDownvote/${id}`
+            await fetch(url, { method: "PATCH" })
+        } catch (error) {
+            console.error(`Error removing upvote to post with id "${id}"`)
+        }
+    }
 
+    async function addDownvote(id: number) {
+        try {
+            let url = `http://localhost:8080/posts/addDownvote/${id}`
+            await fetch(url, { method: "PATCH" })
+        } catch (error) {
+            console.error(`Error adding upvote to post with id "${id}"`)
+        }
+    }
 
     const handleUpvoteClick = (post: feedData): void => {
 
         if (post.clickedUpvote) {
-            // post.clickedUpvote = false
-            // post.upvotes = post.upvotes - 1
             removeUpvote(post.id)
             setFeedData(feedData.map((item) => item.id === post.id ? { ...item, upvotes: item.upvotes - 1, clickedUpvote: !item.clickedUpvote } : item))
         } else {
-            // post.clickedUpvote = true
-            // post.upvotes = post.upvotes + 1
             addUpvote(post.id)
             setFeedData(feedData.map(item => item.id === post.id ? { ...item, upvotes: item.upvotes + 1, clickedUpvote: !item.clickedUpvote } : item))
         }
     }
 
+    const handleDownvoteClick = (post: feedData): void => {
 
+        if (post.clickedDownvote) {
+            removeDownvote(post.id)
+            setFeedData(feedData.map((item) => item.id === post.id ? { ...item, downvotes: item.downvotes - 1, clickedDownvote: !item.clickedDownvote } : item))
+        } else {
+            addDownvote(post.id)
+            setFeedData(feedData.map(item => item.id === post.id ? { ...item, downvotes: item.downvotes + 1, clickedDownvote: !item.clickedDownvote } : item))
+        }
+    }
 
+    const handlePostClick = (id: number): void => {
+        if (id) {
+            router.push(`/post?id=${id}`)
+        }
+    }
+
+    const handleCommentClick = (id: number): void => {
+        if (id) {
+            router.push(`/post?id=${id}#comments`)
+        }
+    }
 
     let content = (
-        <div className="max-w-xl mx-auto">
+
+        <>
+            <div className="flex pt-4 pb-4 items-center">
+                <div>Sort by</div>
+                <button className="ml-auto mr-0 border-2 border-blue-400 hover:bg-gray-200 rounded-full px-2" onClick={() => { router.push("/create") }}> Create Post </button>
+            </div>
             {feedData.map((item) => (
                 <div
                     key={item.id}
                     className="border border-gray-200 rounded-lg p-4 mb-4 bg-white shadow-sm"
                 >
-                    <h2 className="text-lg font-semibold mb-2">{item.title}</h2>
+                    <a className="text-lg font-semibold mb-2 hover:cursor-pointer hover:text-blue-600 " onClick={() => handlePostClick(item.id)}>{item.title}</a>
                     <p className="mb-4 text-gray-700">{item.content}</p>
                     <div className="flex items-center gap-4">
-                        <button className="flex items-center text-gray-600 hover:text-blue-500 text-base" onClick={() => handleUpvoteClick(item)}>
-                            ⬆️ <span className="ml-1">{item.upvotes}</span>
-                        </button>
-                        <button className="flex items-center text-gray-600 hover:text-red-500 text-base">
-                            ⬇️ <span className="ml-1">{item.downvotes}</span>
-                        </button>
-                        <button className="flex items-center text-gray-600 hover:text-green-500 text-base">
-                            💬 <span className="ml-1"></span>
+                        <Upvote handler={handleUpvoteClick} data={item} clicked={item.clickedUpvote} />
+                        <Downvote handler={handleDownvoteClick} data={item} clicked={item.clickedDownvote} />
+                        <button className="flex items-center text-gray-600 hover:text-green-500 text-base" onClick={() => handleCommentClick(item.id)}>
+                            <IconMessageCircle /> {item.commentCount} <span className="ml-1"></span>
                         </button>
                     </div>
                 </div>
             ))}
-        </div>
+        </>
     );
 
     let loadingIndicator = (

@@ -14,7 +14,7 @@ func CORS() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
-		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, PATCH, DELETE")
 
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(http.StatusNoContent)
@@ -43,12 +43,12 @@ func main() {
 
 	//GET REQUESTS
 	r.GET("/posts", handlers.GetPosts(db))
-	// r.GET("/post/:id", handlers.GetPost(db))
-	// r.GET("/comments")
+	r.GET("/post/:id", handlers.GetPost(db))
+	r.GET("/comments/:id", handlers.GetComments(db))
 
 	//POST REQUESTS
 	r.POST("/post", handlers.CreatePost(db))
-	// r.POST("/comment")
+	r.POST("/comment", handlers.CreateComment(db))
 
 	//UPDATE REQUESTS
 	// r.PUT("/post")
