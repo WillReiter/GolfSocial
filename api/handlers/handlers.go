@@ -37,8 +37,7 @@ func GetPosts(db *gorm.DB) gin.HandlerFunc {
 				ID:           item.ID,
 				Title:        item.Title,
 				Content:      item.Content,
-				Upvotes:      item.Upvotes,
-				Downvotes:    item.Downvotes,
+				Votes:        item.Votes,
 				CommentCount: len(result),
 				UserID:       item.UserID,
 			}
@@ -82,8 +81,7 @@ func GetPost(db *gorm.DB) gin.HandlerFunc {
 			ID:           post_result.ID,
 			Title:        post_result.Title,
 			Content:      post_result.Content,
-			Upvotes:      post_result.Upvotes,
-			Downvotes:    post_result.Downvotes,
+			Votes:        post_result.Votes,
 			CommentCount: len(comment_result),
 			UserID:       post_result.UserID,
 		}
@@ -113,12 +111,11 @@ func GetComments(db *gorm.DB) gin.HandlerFunc {
 
 		for _, item := range result {
 			comment := responsemodels.Comment{
-				ID:        item.ID,
-				PostID:    item.PostID,
-				Content:   item.Content,
-				Upvotes:   item.Upvotes,
-				Downvotes: item.Downvotes,
-				UserID:    item.UserID,
+				ID:      item.ID,
+				PostID:  item.PostID,
+				Content: item.Content,
+				Votes:   item.Votes,
+				UserID:  item.UserID,
 			}
 
 			comments = append(comments, comment)
@@ -185,7 +182,7 @@ func CreateComment(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func AddUpvote(db *gorm.DB) gin.HandlerFunc {
+func AddVote(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
@@ -195,7 +192,7 @@ func AddUpvote(db *gorm.DB) gin.HandlerFunc {
 			return
 		}
 
-		err = repository.AddUpvote(db, idInt)
+		err = repository.AddVote(db, idInt)
 		if err != nil {
 			c.JSON(500, gin.H{"message": fmt.Sprintf("Error adding upvote to post with id `%d`", idInt)})
 			return
@@ -205,7 +202,7 @@ func AddUpvote(db *gorm.DB) gin.HandlerFunc {
 	}
 }
 
-func RemoveUpvote(db *gorm.DB) gin.HandlerFunc {
+func RemoveVote(db *gorm.DB) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		id := c.Param("id")
 
@@ -217,7 +214,7 @@ func RemoveUpvote(db *gorm.DB) gin.HandlerFunc {
 
 		//The better way of doing this is to get check for invalid decrement in the handler before actually doing the decrement for handling erros properly
 		//Reason for this is because we shouldn't throw a 500 error when we try to decrement a count <= 0.
-		err = repository.RemoveUpvote(db, idInt)
+		err = repository.RemoveVote(db, idInt)
 		if err != nil {
 			log.Printf("ERROR: %s", err.Error())
 			c.JSON(500, gin.H{"message": fmt.Sprintf("Error removing upvote to post with id `%d`", idInt)})
@@ -225,48 +222,5 @@ func RemoveUpvote(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		c.JSON(200, gin.H{"message: ": fmt.Sprintf("Successfully removed upvote to post with id `%d`", idInt)})
-	}
-}
-
-func AddDownvote(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		id := c.Param("id")
-
-		idInt, err := strconv.Atoi(id)
-		if err != nil || id == "" || idInt < 0 {
-			c.JSON(400, gin.H{"message: ": fmt.Sprintf("Invalid id provided `%s`. Should be a integer greater than or equal to zero.", id)})
-			return
-		}
-
-		err = repository.AddDownvote(db, idInt)
-		if err != nil {
-			c.JSON(500, gin.H{"message": fmt.Sprintf("Error adding downvote to post with id `%d`", idInt)})
-			return
-		}
-
-		c.JSON(200, gin.H{"message: ": fmt.Sprintf("Successfully added downvote to post with id `%d`", idInt)})
-	}
-}
-
-func RemoveDownvote(db *gorm.DB) gin.HandlerFunc {
-	return func(c *gin.Context) {
-		id := c.Param("id")
-
-		idInt, err := strconv.Atoi(id)
-		if err != nil || id == "" || idInt < 0 {
-			c.JSON(400, gin.H{"message: ": fmt.Sprintf("Invalid id provided `%s`. Should be a integer greater than or equal to zero.", id)})
-			return
-		}
-
-		//The better way of doing this is to get check for invalid decrement in the handler before actually doing the decrement for handling erros properly
-		//Reason for this is because we shouldn't throw a 500 error when we try to decrement a count <= 0.
-		err = repository.RemoveDownvote(db, idInt)
-		if err != nil {
-			log.Printf("ERROR: %s", err.Error())
-			c.JSON(500, gin.H{"message": fmt.Sprintf("Error removing downvote to post with id `%d`", idInt)})
-			return
-		}
-
-		c.JSON(200, gin.H{"message: ": fmt.Sprintf("Successfully removed downvote to post with id `%d`", idInt)})
 	}
 }

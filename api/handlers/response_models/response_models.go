@@ -4,30 +4,24 @@ type Post struct {
 	ID           int    `json:"id"`
 	Title        string `json:"title"`
 	Content      string `json:"content"`
-	Upvotes      int    `json:"upvotes"`
-	Downvotes    int    `json:"downvotes"`
+	Votes        int    `json:"votes"`
 	CommentCount int    `json:"commentCount"`
-	//Should be an int, just rolling w it because of test data :(
-	UserID string `json:"userId"`
+	UserID       int    `json:"userId"`
 }
 
 type PostWithComments struct {
-	ID        int       `json:"id"`
-	Title     string    `json:"title"`
-	Content   string    `json:"content"`
-	Upvotes   int       `json:"upvotes"`
-	Downvotes int       `json:"downvotes"`
-	Comment   []Comment `json:"comments"`
-	//Should be an int, just rolling w it because of test data :(
-	UserID string `json:"userId"`
+	ID      int       `json:"id"`
+	Title   string    `json:"title"`
+	Content string    `json:"content"`
+	Votes   int       `json:"votes"`
+	Comment []Comment `json:"comments"`
+	UserID  int       `json:"userId"`
 }
 
 type Comment struct {
-	ID        int    `json:"id"`
-	PostID    int    `json:"post_id"`
-	Content   string `json:"content"`
-	Upvotes   int    `json:"upvotes"`
-	Downvotes int    `json:"downvotes"`
-	//Should be an int, just rolling w it because of test data :(
-	UserID string `json:"user_id"`
+	ID      int    `json:"id"`
+	PostID  int    `json:"post_id"`
+	Content string `json:"content"`
+	Votes   int    `json:"votes"`
+	UserID  int    `json:"user_id"`
 }

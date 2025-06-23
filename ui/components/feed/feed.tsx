@@ -1,21 +1,20 @@
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { IconMessageCircle } from '@tabler/icons-react';
-import Upvote from '../upvote/upvote';
-import Downvote from '../downvote/downvote';
+import Vote from '../vote/vote';
+import Share from '../share/share';
 
 interface feedData {
     id: number,
     title: string,
     content: string,
-    upvotes: number,
-    downvotes: number,
+    votes: number,
     commentCount: number,
     // The clicked logic is flawed. Should be a var of type string that is called 'Voted' with possible values [up, down, no] to stop from being able to upvote and downvote a post
-    clickedUpvote: boolean,
-    clickedDownvote: boolean,
+    // clickedUpvote: boolean,
+    // clickedDownvote: boolean,
 }
 
 const Feed = () => {
@@ -42,63 +41,57 @@ const Feed = () => {
         }
     }
 
-    async function removeUpvote(id: number) {
+    async function addVote(id: number) {
         try {
-            let url = `http://localhost:8080/posts/removeUpvote/${id}`
+            let url = `http://localhost:8080/posts/addVote/${id}`
             await fetch(url, { method: "PATCH" })
         } catch (error) {
-            console.error(`Error removing upvote to post with id "${id}"`)
+            console.error(`Error adding vote to post with id "${id}"`)
         }
     }
 
-    async function addUpvote(id: number) {
+    async function removeVote(id: number) {
         try {
-            let url = `http://localhost:8080/posts/addUpvote/${id}`
+            let url = `http://localhost:8080/posts/removeVote/${id}`
             await fetch(url, { method: "PATCH" })
         } catch (error) {
-            console.error(`Error adding upvote to post with id "${id}"`)
+            console.error(`Error removing vote to post with id "${id}"`)
         }
     }
 
-    async function removeDownvote(id: number) {
-        try {
-            let url = `http://localhost:8080/posts/removeDownvote/${id}`
-            await fetch(url, { method: "PATCH" })
-        } catch (error) {
-            console.error(`Error removing upvote to post with id "${id}"`)
-        }
+    // const handleUpvoteClick = (post: feedData): void => {
+
+    //     if (post.clickedUpvote) {
+    //         removeVoteote(post.id)
+    //         setFeedData(feedData.map((item) => item.id === post.id ? { ...item, upvotes: item.upvotes - 1, clickedUpvote: !item.clickedUpvote } : item))
+    //     } else {
+    //         addUpvote(post.id)
+    //         setFeedData(feedData.map(item => item.id === post.id ? { ...item, upvotes: item.upvotes + 1, clickedUpvote: !item.clickedUpvote } : item))
+    //     }
+    // }
+
+    // const handleDownvoteClick = (post: feedData): void => {
+
+    //     if (post.clickedDownvote) {
+    //         removeDownvote(post.id)
+    //         setFeedData(feedData.map((item) => item.id === post.id ? { ...item, downvotes: item.downvotes - 1, clickedDownvote: !item.clickedDownvote } : item))
+    //     } else {
+    //         addDownvote(post.id)
+    //         setFeedData(feedData.map(item => item.id === post.id ? { ...item, downvotes: item.downvotes + 1, clickedDownvote: !item.clickedDownvote } : item))
+    //     }
+    // }
+
+    const handleAddVote = (post: feedData): void => {
+        addVote(post.id)
+        setFeedData(feedData.map(item => item.id === post.id ? { ...item, votes: item.votes + 1 } : item))
     }
 
-    async function addDownvote(id: number) {
-        try {
-            let url = `http://localhost:8080/posts/addDownvote/${id}`
-            await fetch(url, { method: "PATCH" })
-        } catch (error) {
-            console.error(`Error adding upvote to post with id "${id}"`)
-        }
+    const handleRemoveVote = (post: feedData): void => {
+        removeVote(post.id)
+        setFeedData(feedData.map(item => item.id === post.id ? { ...item, votes: item.votes - 1 } : item))
     }
 
-    const handleUpvoteClick = (post: feedData): void => {
-
-        if (post.clickedUpvote) {
-            removeUpvote(post.id)
-            setFeedData(feedData.map((item) => item.id === post.id ? { ...item, upvotes: item.upvotes - 1, clickedUpvote: !item.clickedUpvote } : item))
-        } else {
-            addUpvote(post.id)
-            setFeedData(feedData.map(item => item.id === post.id ? { ...item, upvotes: item.upvotes + 1, clickedUpvote: !item.clickedUpvote } : item))
-        }
-    }
-
-    const handleDownvoteClick = (post: feedData): void => {
-
-        if (post.clickedDownvote) {
-            removeDownvote(post.id)
-            setFeedData(feedData.map((item) => item.id === post.id ? { ...item, downvotes: item.downvotes - 1, clickedDownvote: !item.clickedDownvote } : item))
-        } else {
-            addDownvote(post.id)
-            setFeedData(feedData.map(item => item.id === post.id ? { ...item, downvotes: item.downvotes + 1, clickedDownvote: !item.clickedDownvote } : item))
-        }
-    }
+    useEffect(() => { console.log(feedData) }, [feedData])
 
     const handlePostClick = (id: number): void => {
         if (id) {
@@ -113,25 +106,30 @@ const Feed = () => {
     }
 
     let content = (
-
         <>
             <div className="flex pt-4 pb-4 items-center">
                 <div>Sort by</div>
-                <button className="ml-auto mr-0 border-2 border-blue-400 hover:bg-gray-200 rounded-full px-2" onClick={() => { router.push("/create") }}> Create Post </button>
+                <button className="ml-auto mr-0 bg-gray-600 hover:bg-gray-500 rounded-full px-2" onClick={() => { router.push("/create") }}> Create Post </button>
             </div>
-            {feedData.map((item) => (
-                <div
-                    key={item.id}
-                    className="border border-gray-200 rounded-lg p-4 mb-4 bg-white shadow-sm"
-                >
-                    <a className="text-lg font-semibold mb-2 hover:cursor-pointer hover:text-blue-600 " onClick={() => handlePostClick(item.id)}>{item.title}</a>
-                    <p className="mb-4 text-gray-700">{item.content}</p>
-                    <div className="flex items-center gap-4">
-                        <Upvote handler={handleUpvoteClick} data={item} clicked={item.clickedUpvote} />
-                        <Downvote handler={handleDownvoteClick} data={item} clicked={item.clickedDownvote} />
-                        <button className="flex items-center text-gray-600 hover:text-green-500 text-base" onClick={() => handleCommentClick(item.id)}>
-                            <IconMessageCircle /> {item.commentCount} <span className="ml-1"></span>
-                        </button>
+            {feedData && feedData.length > 0 && feedData.map((item) => (
+                <div className="hover:cursor-pointer">
+                    {/* <div className="hover:cursor-pointer" onClick={() => handlePostClick(item.id)}> */}
+                    <div className='border-b' />
+                    <div
+                        key={item.id}
+                        className="rounded-lg hover:bg-neutral-900 p-4 my-2 shadow-sm"
+                    >
+                        <a className="text-lg font-semibold mb-2 hover:cursor-pointer">{item.title}</a>
+                        <p className="mb-4 ">{item.content}</p>
+                        <div className="flex items-center gap-4">
+                            <Vote addVoteHandler={handleAddVote} removeVoteHandler={handleRemoveVote} data={item}></Vote>
+                            <div className='bg-gray-600 rounded-full p-2 hover:bg-gray-500'>
+                                <button className="flex items-center text-base" onClick={() => handleCommentClick(item.id)}>
+                                    <IconMessageCircle stroke={1} />  <span className="ml-1">{item.commentCount}</span>
+                                </button>
+                            </div>
+                            <Share data={item} />
+                        </div>
                     </div>
                 </div>
             ))}
@@ -144,24 +142,21 @@ const Feed = () => {
         </div>
     );
     let noData = (
-        <div className="flex justify-center items-center h-screen">
-            <div className="text-gray-500 text-lg">
-                No posts available.
+        <>
+            <div className="flex pt-4 pb-4 items-center">
+                <div>Sort by</div>
+                <button className="ml-auto mr-0 bg-gray-600 hover:bg-gray-500 rounded-full px-2" onClick={() => { router.push("/create") }}> Create Post </button>
             </div>
-        </div>
-    );
-    if (isLoading) {
-        content = loadingIndicator;
-    } else if (feedData.length === 0) {
-        content = (
             <div className="flex justify-center items-center h-screen">
                 <div className="text-gray-500 text-lg">
                     No posts available.
                 </div>
             </div>
-        );
-    }
-    if (feedData.length === 0 && !isLoading) {
+        </>
+    );
+    if (isLoading) {
+        content = loadingIndicator;
+    } else if (feedData && feedData.length === 0 || !feedData) {
         content = noData;
     }
 

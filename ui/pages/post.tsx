@@ -2,9 +2,8 @@
 
 
 import React, { useState, useEffect } from "react";
-import Upvote from "../components/upvote/upvote";
-import Downvote from "../components/downvote/downvote";
 import { IconDots } from "@tabler/icons-react";
+import Vote from "../components/vote/vote";
 
 
 interface feedData {
@@ -76,7 +75,7 @@ const Post = () => {
                 content: String(newComment),
                 postID: id,
                 // TODO: UPDATE WITH REAL USERID
-                userID: "999",
+                userID: 999,
             }
             await fetch(url, {
                 method: "POST",
@@ -146,12 +145,13 @@ const Post = () => {
             <div className=" py-4 text-2xl font-medium">{postData.title}</div>
             <div className="  py-4">{postData.content}</div>
             <div className="  py-4 flex">
-                <div className="pr-4 border-2 rounded-full bg-gray-200 mx-4">
+                {/* <div className="pr-4 border-2 rounded-full bg-gray-500 mx-4">
                     <Upvote handler={() => { }} data={postData} />
                 </div>
-                <div className="pr-4 border-2 rounded-full bg-gray-200">
+                <div className="pr-4 border-2 rounded-full bg-gray-500">
                     <Downvote className="px-2" handler={() => { }} data={postData} />
-                </div>
+                </div> */}
+                <Vote addVoteHandler={() => { }} removeVoteHandler={() => { }} data={postData}></Vote>
             </div>
         </div>
     )
@@ -164,7 +164,7 @@ const Post = () => {
                     placeholder="Join the conversation"
                     value={newComment}
                     onChange={(text) => setNewComment(text.target.value)} />
-                <button className="mr-0 ml-auto bg-blue-300 rounded-full px-4" onClick={handleSubmitComment}>Reply</button>
+                <button className="mr-0 ml-auto bg-gray-500 rounded-full px-4" onClick={handleSubmitComment}>Reply</button>
             </div>
             <div className="flex py-4">
                 <div>
@@ -192,11 +192,7 @@ const Post = () => {
                             <div className="flex pt-2">
                                 <div className="ml-1 mr-2">
                                     {/* TODO UPDATE HANDLER */}
-                                    <Upvote handler={() => { }} data={comment} />
-                                </div>
-                                <div className="mr-2">
-                                    {/* TODO UPDATE HANDLER */}
-                                    <Downvote handler={() => { }} data={comment} />
+                                    <Vote></Vote>
                                 </div>
                                 <div className="ml-auto mr-1">
                                     <IconDots />

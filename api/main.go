@@ -56,10 +56,8 @@ func main() {
 
 	//PATCH REQUESTS
 	//TODO: Move upvote/downvote to a MQ system
-	r.PATCH("/posts/addUpvote/:id", handlers.AddUpvote(db))
-	r.PATCH("/posts/removeUpvote/:id", handlers.RemoveUpvote(db))
-	r.PATCH("/posts/addDownvote/:id", handlers.AddDownvote(db))
-	r.PATCH("/posts/removeDownvote/:id", handlers.RemoveDownvote(db))
+	r.PATCH("/posts/addVote/:id", handlers.AddVote(db))
+	r.PATCH("/posts/removeVote/:id", handlers.RemoveVote(db))
 
 	r.Run() // listen and serve on 0.0.0.0:8080
 

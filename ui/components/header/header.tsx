@@ -1,9 +1,18 @@
-import router from "next/router";
+import router, { Router, useRouter } from "next/router";
 import React from "react";
 
 const Header: React.FC = () => {
+    const router = useRouter();
+
+
+    const handleSignupClick = () => {
+        router.push("/signup")
+    }
+    const handleLoginClick = () => {
+        router.push("/login")
+    }
     return (
-        <header className="w-full bg-gray shadow-md px-6 py-3 flex items-center relative">
+        <header className="w-full bg-gray border-b border-white shadow-md px-6 py-3 flex items-center relative">
             {/* Left: Logo Placeholder */}
             <div className="flex items-center">
                 <div className="w-24 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold hover:cursor-pointer hover:text-green-600" onClick={() => router.push("/")}>
@@ -31,10 +40,10 @@ const Header: React.FC = () => {
 
             {/* Right: Login/Signup Buttons */}
             <div className="flex items-center space-x-4 ml-auto">
-                <button className="px-4 py-2 text-blue-600 font-semibold rounded hover:bg-blue-50 transition">
+                <button className="px-4 py-2 text-blue-600 font-semibold rounded hover:bg-blue-50 transition" onClick={handleLoginClick}>
                     Login
                 </button>
-                <button className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition">
+                <button className="px-4 py-2 bg-blue-600 text-white font-semibold rounded hover:bg-blue-700 transition" onClick={handleSignupClick}>
                     Sign Up
                 </button>
             </div>
